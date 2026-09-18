@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>食記抽籤挑戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4ead9;
+    --paper-2:#ece0c9;
+    --ink:#3e2f22;
+    --ink-soft:#6b5b48;
+    --line:#b9a780;
+    --terracotta:#c1653a;
+    --terracotta-dark:#a04b28;
+    --mustard:#d3a13c;
+    --olive:#6b7a4f;
+    --stamp:#8a6b52;
+    --card-shadow: 0 10px 24px rgba(62,47,34,0.18);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#26201a;
+      --paper-2:#2f281f;
+      --ink:#f0e6d6;
+      --ink-soft:#cbb99e;
+      --line:#5a4c39;
+      --terracotta:#e07a4c;
+      --terracotta-dark:#c25f34;
+      --mustard:#e0b256;
+      --olive:#8ea36a;
+      --stamp:#c9a888;
+      --card-shadow: 0 10px 24px rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#26201a;
+    --paper-2:#2f281f;
+    --ink:#f0e6d6;
+    --ink-soft:#cbb99e;
+    --line:#5a4c39;
+    --terracotta:#e07a4c;
+    --terracotta-dark:#c25f34;
+    --mustard:#e0b256;
+    --olive:#8ea36a;
+    --stamp:#c9a888;
+    --card-shadow: 0 10px 24px rgba(0,0,0,0.45);
+  }
+  *{box-sizing:border-box;}
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(193,101,58,0.07), transparent 45%),
+      radial-gradient(ellipse at 90% 100%, rgba(107,122,79,0.08), transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    padding: 28px 16px 60px;
+    min-height:100vh;
+  }
+  .wrap{max-width:920px; margin:0 auto;}
+
+  header{
+    text-align:center;
+    margin-bottom: 28px;
+    position:relative;
+  }
+  .accent{
+    font-family:"Caveat", cursive;
+    color:var(--terracotta);
+    font-size: 1.3rem;
+    letter-spacing:.03em;
+    display:block;
+    margin-bottom:2px;
+  }
+  h1{
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    margin: 0 0 8px;
+    letter-spacing:.06em;
+  }
+  h1 .underline{
+    position:relative;
+    display:inline-block;
+  }
+  h1 .underline svg{
+    position:absolute;
+    left:0; right:0; bottom:-8px;
+    width:100%; height:10px;
+  }
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:.92rem;
+    margin:0;
+  }
+  .compass{
+    width:46px; height:46px;
+    margin: 6px auto 10px;
+    opacity:.75;
+  }
+
+  .dice-row{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:16px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 640px){
+    .dice-row{ grid-template-columns: 1fr; }
+  }
+
+  .die-card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 14px 14px;
+    box-shadow: var(--card-shadow);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .die-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .die-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:700;
+    letter-spacing:.04em;
+  }
+  .die-icon{ width:22px; height:22px; stroke:var(--terracotta); flex:none; }
+  .icon-btn{
+    background:none;
+    border:1px solid var(--line);
+    border-radius:8px;
+    color:var(--ink-soft);
+    font-size:.72rem;
+    padding:4px 8px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .icon-btn:hover{ border-color:var(--terracotta); color:var(--terracotta); }
+  .icon-btn.locked{ background:var(--terracotta); color:var(--paper); border-color:var(--terracotta); }
+
+  .reel{
+    height:64px;
+    border-radius:10px;
+    border:1.5px dashed var(--line);
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+  .reel-inner{
+    font-size:1.15rem;
+    font-weight:700;
+    text-align:center;
+    padding: 0 8px;
+    transition: transform .08s linear;
+  }
+  .reel.rolling .reel-inner{
+    filter: blur(0.4px);
+  }
+  .reel-single{
+    width:100%;
+    text-align:center;
+  }
+
+  .edit-panel{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .edit-panel textarea{
+    width:100%;
+    min-height:90px;
+    resize:vertical;
+    font-family:inherit;
+    font-size:.85rem;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .edit-hint{
+    font-size:.7rem;
+    color:var(--ink-soft);
+  }
+
+  .roll-zone{
+    text-align:center;
+    margin: 22px 0 26px;
+  }
+  .roll-btn{
+    font-family:"Noto Sans TC", sans-serif;
+    font-weight:900;
+    font-size:1.1rem;
+    letter-spacing:.15em;
+    color:var(--paper);
+    background: linear-gradient(180deg, var(--terracotta), var(--terracotta-dark));
+    border:none;
+    border-radius:999px;
+    padding:16px 46px;
+    cursor:pointer;
+    box-shadow: 0 8px 0 var(--terracotta-dark), var(--card-shadow);
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .roll-btn:active{
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 var(--terracotta-dark);
+  }
+  .roll-btn:disabled{ opacity:.6; cursor:default; }
+
+  .result-card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    box-shadow: var(--card-shadow);
+    position:relative;
+    margin-bottom:26px;
+    text-align:center;
+  }
+  .result-card::before{
+    content:"";
+    position:absolute; inset:6px;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    pointer-events:none;
+  }
+  .result-label{
+    font-family:"Caveat", cursive;
+    color:var(--olive);
+    font-size:1.2rem;
+  }
+  .result-sentence{
+    font-size:clamp(1.1rem, 4vw, 1.5rem);
+    font-weight:700;
+    line-height:1.7;
+    margin: 6px 0 4px;
+  }
+  .result-sentence b{ color:var(--terracotta); }
+  .stamp{
+    display:inline-block;
+    margin-top:10px;
+    padding:5px 16px;
+    border:2.5px solid var(--stamp);
+    color:var(--stamp);
+    border-radius:8px;
+    font-family:"Caveat", cursive;
+    font-size:1.1rem;
+    transform: rotate(-4deg);
+    opacity:0;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .stamp.show{ opacity:.85; transform: rotate(-4deg) scale(1); }
+
+  .result-actions{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .ghost-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    border-radius:999px;
+    padding:8px 18px;
+    font-family:inherit;
+    font-size:.85rem;
+    cursor:pointer;
+  }
+  .ghost-btn:hover{ border-color:var(--olive); color:var(--olive); }
+
+  .history-section h2{
+    font-size:1rem;
+    letter-spacing:.08em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .history-section h2 svg{ width:18px; height:18px; stroke:var(--ink-soft); }
+  .history-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .history-item{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-size:.85rem;
+  }
+  .history-item .h-text{ color:var(--ink); }
+  .history-item .h-date{ color:var(--ink-soft); font-size:.75rem; white-space:nowrap; }
+  .history-item button{
+    background:none; border:none; color:var(--ink-soft);
+    cursor:pointer; font-size:.75rem; text-decoration:underline;
+    font-family:inherit;
+  }
+  .empty-hint{ color:var(--ink-soft); font-size:.85rem; text-align:center; padding:14px 0; }
+
+  footer{
+    text-align:center;
+    margin-top:34px;
+    color:var(--ink-soft);
+    font-size:.72rem;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <svg class="compass" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4">
+      <circle cx="24" cy="24" r="19"/>
+      <circle cx="24" cy="24" r="1.6" fill="currentColor" stroke="none"/>
+      <path d="M24 8 L28 22 L24 26 L20 22 Z" fill="currentColor" stroke="none" opacity=".85"/>
+      <path d="M24 40 L21 27 L24 24 L27 27 Z" fill="none" opacity=".5"/>
+      <path d="M24 4 v5 M24 39 v5 M4 24 h5 M39 24 h5" stroke-linecap="round"/>
+    </svg>
+    <span class="accent">today's quest</span>
+    <h1>
+      <span class="underline">食記抽籤挑戰
+        <svg viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M2 6 Q 50 2, 100 6 T 198 5" stroke="var(--mustard)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </span>
+    </h1>
+    <p class="subtitle">交通工具 × 地點 × 料理 —— 骰三顆，出門找吃的</p>
+  </header>
+
+  <div class="dice-row" id="diceRow"></div>
+
+  <div class="roll-zone">
+    <button class="roll-btn" id="rollAllBtn">擲　骰</button>
+  </div>
+
+  <div class="result-card" id="resultCard" hidden>
+    <div class="result-label">今日挑戰卡</div>
+    <div class="result-sentence" id="resultSentence"></div>
+    <div class="stamp" id="resultStamp">已接下挑戰</div>
+    <div class="result-actions">
+      <button class="ghost-btn" id="saveBtn">寫進紀錄</button>
+      <button class="ghost-btn" id="rerollBtn">再骰一次</button>
+    </div>
+  </div>
+
+  <div class="history-section">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3.5 2"/></svg>
+      抽籤紀錄（最新在上）
+    </h2>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <footer>候選清單存在這台裝置的瀏覽器裡；抽籤紀錄則同步在雲端，換裝置也看得到</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "food-dice-lists-v1";
+  var SUPABASE_URL = "https://zflmhatasbuqyoofspzj.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_SkCC4ICtdfyJfGp28hXgZw_FuYzvOFc";
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  var CATEGORIES = [
+    {
+      key: "transport",
+      title: "交通工具",
+      icon: '<path d="M4 16l1.5-6A2 2 0 0 1 7.4 8.5h9.2A2 2 0 0 1 18.5 10L20 16"/><rect x="3" y="16" width="18" height="4" rx="1.2"/><circle cx="7.5" cy="20" r="1.4"/><circle cx="16.5" cy="20" r="1.4"/>',
+      defaults: ["走路", "騎機車", "騎腳踏車", "開車", "搭捷運", "搭公車"]
+    },
+    {
+      key: "location",
+      title: "地點",
+      icon: '<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/>',
+      defaults: ["巷弄小吃", "夜市", "百貨美食街", "老字號店家", "郊區小店", "隨機亂走遇到的店"]
+    },
+    {
+      key: "cuisine",
+      title: "料理",
+      icon: '<path d="M6 3v7a3 3 0 0 0 6 0V3M9 10v11M18 3c-2 2-2 5 0 7v11"/>',
+      defaults: ["中式", "日式", "韓式", "義式", "東南亞", "甜點下午茶"]
+    }
+  ];
+
+  var state = {}; // key -> { items:[], current:"", locked:false, rolling:false }
+
+  function loadLists(){
+    var saved = {};
+    try{ saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }catch(e){ saved = {}; }
+    CATEGORIES.forEach(function(cat){
+      var items = (saved[cat.key] && saved[cat.key].length) ? saved[cat.key] : cat.defaults.slice();
+      state[cat.key] = { items: items, current: items[0] || "", locked:false, rolling:false };
+    });
+  }
+
+  function saveLists(){
+    var out = {};
+    CATEGORIES.forEach(function(cat){ out[cat.key] = state[cat.key].items; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+  }
+
+  async function fetchHistory(){
+    var res = await sb.from("dice_rolls").select("*").order("created_at", { ascending:false }).limit(100);
+    if(res.error){ console.error(res.error); return null; }
+    return res.data;
+  }
+
+  function pickRandom(arr, avoid){
+    if(arr.length === 1) return arr[0];
+    var choice;
+    do{ choice = arr[Math.floor(Math.random()*arr.length)]; }
+    while(choice === avoid && arr.length > 1);
+    return choice;
+  }
+
+  // ---------- render dice cards ----------
+  var diceRow = document.getElementById("diceRow");
+
+  function renderDiceRow(){
+    diceRow.innerHTML = "";
+    CATEGORIES.forEach(function(cat){
+      var s = state[cat.key];
+      var card = document.createElement("div");
+      card.className = "die-card";
+      card.innerHTML =
+        '<div class="die-head">' +
+          '<div class="die-title">' +
+            '<svg class="die-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + cat.icon + '</svg>' +
+            '<span>' + cat.title + '</span>' +
+          '</div>' +
+          '<div style="display:flex; gap:6px;">' +
+            '<button class="icon-btn lock-btn" data-key="' + cat.key + '">鎖定</button>' +
+            '<button class="icon-btn edit-btn" data-key="' + cat.key + '">編輯清單</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="reel" data-key="' + cat.key + '"><div class="reel-inner reel-single">' + s.current + '</div></div>' +
+        '<div class="edit-panel" data-key="' + cat.key + '" hidden>' +
+          '<textarea rows="6">' + s.items.join("\n") + '</textarea>' +
+          '<span class="edit-hint">一行一個選項，關閉編輯即自動儲存</span>' +
+        '</div>';
+      diceRow.appendChild(card);
+    });
+
+    // wire up lock buttons
+    diceRow.querySelectorAll(".lock-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var key = btn.getAttribute("data-key");
+        state[key].locked = !state[key].locked;
+        btn.classList.toggle("locked", state[key].locked);
+        btn.textContent = state[key].locked ? "已鎖定" : "鎖定";
+      });
+    });
+
+    // wire up edit buttons
+    diceRow.querySelectorAll(".edit-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var key = btn.getAttribute("data-key");
+        var panel = diceRow.querySelector('.edit-panel[data-key="' + key + '"]');
+        var isOpen = !panel.hidden;
+        if(isOpen){
+          var textarea = panel.querySelector("textarea");
+          var lines = textarea.value.split("\n").map(function(t){return t.trim();}).filter(Boolean);
+          if(lines.length){
+            state[key].items = lines;
+            if(lines.indexOf(state[key].current) === -1){
+              state[key].current = lines[0];
+              var reel = diceRow.querySelector('.reel[data-key="' + key + '"] .reel-inner');
+              reel.textContent = state[key].current;
+            }
+            saveLists();
+          }
+          panel.hidden = true;
+          btn.textContent = "編輯清單";
+        } else {
+          panel.hidden = false;
+          btn.textContent = "完成編輯";
+        }
+      });
+    });
+  }
+
+  // ---------- rolling animation ----------
+  function rollOne(key, onDone){
+    var s = state[key];
+    if(s.locked){ onDone(s.current); return; }
+    var reelEl = diceRow.querySelector('.reel[data-key="' + key + '"]');
+    var innerEl = reelEl.querySelector(".reel-inner");
+    reelEl.classList.add("rolling");
+
+    var final = pickRandom(s.items, s.current);
+    var ticks = 14;
+    var delay = 60;
+    var i = 0;
+
+    function tick(){
+      i++;
+      if(i < ticks){
+        innerEl.textContent = s.items[Math.floor(Math.random()*s.items.length)];
+        delay += i * 4; // ease out
+        setTimeout(tick, delay);
+      } else {
+        innerEl.textContent = final;
+        reelEl.classList.remove("rolling");
+        s.current = final;
+        onDone(final);
+      }
+    }
+    tick();
+  }
+
+  function rollAll(){
+    rollAllBtn.disabled = true;
+    resultCard.hidden = true;
+    stampEl.classList.remove("show");
+
+    var pending = CATEGORIES.length;
+    var results = {};
+    CATEGORIES.forEach(function(cat){
+      rollOne(cat.key, function(val){
+        results[cat.key] = val;
+        pending--;
+        if(pending === 0){
+          finishRoll(results);
+        }
+      });
+    });
+  }
+
+  function finishRoll(results){
+    rollAllBtn.disabled = false;
+    var sentence =
+      '<b>' + results.transport + '</b> 前往 <b>' + results.location + '</b>，吃 <b>' + results.cuisine + '</b>';
+    resultSentence.innerHTML = sentence;
+    resultCard.hidden = false;
+    setTimeout(function(){ stampEl.classList.add("show"); }, 150);
+    lastResult = results;
+  }
+
+  // ---------- history ----------
+  var historyList = document.getElementById("historyList");
+
+  async function renderHistory(){
+    historyList.innerHTML = '<div class="empty-hint">載入中…</div>';
+    var items = await fetchHistory();
+    if(items === null){
+      historyList.innerHTML = '<div class="empty-hint">紀錄載入失敗，稍後重新整理再試一次</div>';
+      return;
+    }
+    if(!items.length){
+      historyList.innerHTML = '<div class="empty-hint">還沒有紀錄，骰完之後按「寫進紀錄」就會出現在這裡</div>';
+      return;
+    }
+    historyList.innerHTML = "";
+    items.forEach(function(entry){
+      var row = document.createElement("div");
+      row.className = "history-item";
+      row.innerHTML =
+        '<span class="h-text">' + entry.transport + ' → ' + entry.location + ' → ' + entry.cuisine + '</span>' +
+        '<span class="h-date">' + formatDate(new Date(entry.created_at)) + '</span>' +
+        '<button data-id="' + entry.id + '">刪除</button>';
+      historyList.appendChild(row);
+    });
+    historyList.querySelectorAll("button[data-id]").forEach(function(btn){
+      btn.addEventListener("click", async function(){
+        btn.disabled = true;
+        var id = btn.getAttribute("data-id");
+        await sb.from("dice_rolls").delete().eq("id", id);
+        renderHistory();
+      });
+    });
+  }
+
+  function formatDate(d){
+    function pad(n){ return n < 10 ? "0"+n : ""+n; }
+    return d.getFullYear() + "/" + pad(d.getMonth()+1) + "/" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+
+  // ---------- wire up top-level controls ----------
+  var rollAllBtn = document.getElementById("rollAllBtn");
+  var resultCard = document.getElementById("resultCard");
+  var resultSentence = document.getElementById("resultSentence");
+  var stampEl = document.getElementById("resultStamp");
+  var saveBtn = document.getElementById("saveBtn");
+  var rerollBtn = document.getElementById("rerollBtn");
+  var lastResult = null;
+
+  rollAllBtn.addEventListener("click", rollAll);
+  rerollBtn.addEventListener("click", rollAll);
+  saveBtn.addEventListener("click", async function(){
+    if(!lastResult) return;
+    saveBtn.disabled = true;
+    var res = await sb.from("dice_rolls").insert({
+      transport: lastResult.transport,
+      location: lastResult.location,
+      cuisine: lastResult.cuisine
+    });
+    saveBtn.disabled = false;
+    if(res.error){
+      console.error(res.error);
+      saveBtn.textContent = "寫入失敗";
+      setTimeout(function(){ saveBtn.textContent = "寫進紀錄"; }, 1500);
+      return;
+    }
+    renderHistory();
+    saveBtn.textContent = "已寫入";
+    setTimeout(function(){ saveBtn.textContent = "寫進紀錄"; }, 1200);
+  });
+
+  // ---------- init ----------
+  loadLists();
+  renderDiceRow();
+  renderHistory();
+
+})();
+</script>
+</body>
+</html>
