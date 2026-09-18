@@ -311,15 +311,20 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:10px;
+    flex-wrap:wrap;
+    row-gap:4px;
+    column-gap:10px;
     font-size:.85rem;
   }
-  .history-item .h-text{ color:var(--ink); }
+  .history-item .h-text{ color:var(--ink); flex:1 1 100%; min-width:0; word-break:break-word; }
   .history-item .h-date{ color:var(--ink-soft); font-size:.75rem; white-space:nowrap; }
   .history-item button{
     background:none; border:none; color:var(--ink-soft);
     cursor:pointer; font-size:.75rem; text-decoration:underline;
     font-family:inherit;
+    white-space:nowrap;
+    flex-shrink:0;
+    margin-left:auto;
   }
   .empty-hint{ color:var(--ink-soft); font-size:.85rem; text-align:center; padding:14px 0; }
 
